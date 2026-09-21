@@ -1,0 +1,32 @@
+
+:root{
+  --paper:#fff9f7;--white:#fffdfb;--rose:#a64f65;--blush:#d9a0ae;
+  --soft:#f4dde3;--ink:#2b2320;--muted:#74645e;--line:#eadbd7
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:Arial,Helvetica,sans-serif;line-height:1.55}
+.wrap{max-width:1060px;margin:auto;padding:0 16px}
+header{border-bottom:1px solid var(--line);background:rgba(255,249,247,.96)}
+.nav{height:68px;display:flex;align-items:center;justify-content:space-between}
+.brand{font-family:Georgia,serif;font-weight:700;font-size:24px;text-decoration:none;color:var(--ink)}
+.brand span{color:var(--rose)}
+nav a{color:var(--ink);text-decoration:none;font-weight:700;font-size:14px}
+.hero{padding:52px 0 30px}
+.kicker{color:var(--rose);font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+h1,h2,h3{font-family:Georgia,serif}
+h1{font-size:clamp(42px,7vw,74px);line-height:1;letter-spacing:-.035em;margin:10px 0 16px}
+h2{font-size:34px;margin:0 0 10px}
+.hero p,.muted{color:var(--muted)}
+.post-grid,.product-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:24px 0 40px}
+.post-card,.product{background:var(--white);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.post-art,.product-art{min-height:190px;display:grid;place-items:center;background:linear-gradient(145deg,#f7dfe5,#f6eee9);font-size:64px}
+.post-copy,.product-copy{padding:18px}
+.post-copy a,.product-copy a{display:inline-block;margin-top:10px;background:var(--ink);color:white;text-decoration:none;padding:11px 14px;border-radius:10px;font-weight:800;font-size:14px}
+.product-category{color:var(--rose);font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:800}
+.product h3{margin:7px 0 8px;font-size:22px}
+.product p{margin:0;color:var(--muted);font-size:14px}
+.product small{display:block;margin-top:8px;color:var(--muted)}
+.notice{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:16px;margin:24px 0;color:var(--muted);font-size:13px}
+.back{display:inline-block;margin:26px 0 0;color:var(--rose);font-weight:800;text-decoration:none}
+footer{padding:26px 0 40px;color:var(--muted);font-size:12px;text-align:center}
+@media(max-width:700px){.post-grid,.product-grid{grid-template-columns:1fr}.hero{padding-top:34px}}
