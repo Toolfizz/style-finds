@@ -30,3 +30,11 @@ h2{font-size:34px;margin:0 0 10px}
 .back{display:inline-block;margin:26px 0 0;color:var(--rose);font-weight:800;text-decoration:none}
 footer{padding:26px 0 40px;color:var(--muted);font-size:12px;text-align:center}
 @media(max-width:700px){.post-grid,.product-grid{grid-template-columns:1fr}.hero{padding-top:34px}}
+
+.product-image{
+  width:100%;
+  height:auto;
+  display:block;
+  object-fit:contain;
+  image-rendering:auto;
+}
