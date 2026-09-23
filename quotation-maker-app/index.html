@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111111">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Quotation Maker">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./icon.svg">
+<title>Quotation Maker</title>
+<style>
+:root{--y:#f5a800;--ink:#171717;--muted:#6b7280;--line:#e5e7eb;--bg:#f4f5f7}
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--ink)}
+header{position:sticky;top:0;z-index:20;background:#111;color:#fff;padding:calc(10px + env(safe-area-inset-top)) 12px 10px}
+h1{font-size:19px;margin:0}.sub{font-size:11px;color:#ccc;margin-top:2px}.tabs{display:flex;gap:7px;overflow:auto;margin-top:10px}.tab{border:1px solid #4b5563;background:#222;color:#fff;border-radius:10px;padding:9px 11px;font-weight:800;white-space:nowrap}.tab.active{background:var(--y);color:#111;border-color:var(--y)}
+main{max-width:980px;margin:auto;padding:10px 10px calc(20px + env(safe-area-inset-bottom))}.view{display:none}.view.active{display:block}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:10px;box-shadow:0 2px 10px #0000000d}.card h2{font-size:17px;margin:0 0 12px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.full{grid-column:1/-1}
+label{display:block;font-size:12px;font-weight:800;color:#444;margin-bottom:5px}input,select,textarea{width:100%;font:inherit;font-size:16px;border:1px solid #d1d5db;border-radius:10px;padding:11px;background:#fff}textarea{min-height:92px;resize:vertical}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.btn{border:0;border-radius:10px;padding:11px 13px;font-weight:850;font-size:14px}.yellow{background:var(--y);color:#111}.dark{background:#111;color:#fff}.light{background:#f2f3f5;color:#111}.danger{background:#fee2e2;color:#991b1b}
+.note{font-size:12px;line-height:1.45;color:#666;background:#fff8e8;border:1px solid #ffe2a1;border-radius:10px;padding:10px;margin:10px 0}
+.service{border:1px solid var(--line);border-radius:12px;padding:10px;margin-top:9px;background:#fffdf7}.service-title{font-weight:900;font-size:14px}.desc{font-size:12px;color:#666;white-space:pre-line;margin-top:4px}.service-grid{display:grid;grid-template-columns:82px 1fr 42px;gap:7px;margin-top:9px}
+.saved{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}.saved-item{border:1px solid var(--line);border-radius:12px;padding:12px}.saved-item h3{font-size:16px;margin:0}.meta{font-size:12px;color:#666;line-height:1.5;margin-top:6px}.total{font-weight:900;color:#805100;margin-top:7px}
+.preset{border:1px solid var(--line);border-radius:12px;padding:11px;margin-top:9px}.preset h3{font-size:15px;margin:0}.preset p{font-size:12px;color:#555;white-space:pre-line}
+.preview-btn{width:100%}.preview{display:none;background:#ddd;padding:6px;border-radius:12px;overflow:auto}.preview.open{display:block}
+.paper{width:210mm;height:297mm;background:#fff;border:1px solid #e5a31c;padding:13mm 12mm;position:relative;overflow:hidden;transform:scale(.43);transform-origin:top left;margin-bottom:-169mm;font-family:Georgia,serif;color:#111}
+.logo{font-family:Georgia,serif;font-weight:900;font-size:22pt;letter-spacing:.5px}.logo span{color:#e14b23}.qtitle{font-size:17pt;font-weight:700;margin-top:4mm;border-bottom:2px solid #e14b23;width:62%;padding-bottom:2mm}
+.meta2{display:grid;grid-template-columns:34% 66%;gap:7mm;margin-top:9mm;font-size:10pt}.tofrom{background:#f1f1f1;padding:6mm;display:grid;grid-template-columns:1fr 1fr}.right{text-align:right;font-size:9pt;line-height:1.45}.red{color:#d11;font-weight:700}
+table{width:100%;border-collapse:collapse}.qt{margin-top:7mm;font-size:8.8pt;table-layout:fixed}.qt th{background:#050505;color:#fff;border:1px solid #e5a31c;padding:2.4mm 1.5mm}.qt td{border:1px solid #e5a31c;background:#f4f4f4;padding:2.3mm 1.5mm;vertical-align:top}.qt .id{width:9%;text-align:center}.qt .d{width:47%}.qt .q{width:10%;text-align:center}.qt .p,.qt .t{width:17%;text-align:center}.svcprint{color:#d11;font-weight:800;font-size:10.5pt}.svclines{white-space:pre-line;line-height:1.25}
+.sum{font-size:9pt}.sum td{border:1px solid #e5a31c;padding:1.5mm 2mm}.sum .lab{text-align:right;font-weight:800;background:#fff}.sum .amt{width:17%;text-align:center;background:#ddd;font-weight:700}
+.footer{position:absolute;left:12mm;right:12mm;bottom:8mm;border-top:3px solid #9b6600;padding-top:1.5mm;text-align:right;font-size:9pt}
+.tc-title{text-align:center;font-weight:700;text-decoration:underline;font-size:15pt;margin:8mm 0}.tc{font-size:9.3pt;line-height:1.25}.tc p{margin:0 0 4mm}.tc .center{text-align:center}.additional{border:1px solid #e3b654;background:#fffaf0;padding:3mm;margin-bottom:4mm;white-space:pre-line}.additional:empty{display:none}
+@media(max-width:650px){.grid{grid-template-columns:1fr}.btnrow .btn{flex:1 1 45%}}
+@media(min-width:651px){.paper{transform:scale(.75);margin-bottom:-74mm}}
+@media print{@page{size:A4;margin:0}body{background:#fff}header,main>.view:not(#quoteView),#quoteForm,.preview-btn{display:none!important}main{padding:0;max-width:none}.preview{display:block!important;padding:0;background:#fff}.paper{transform:none;width:210mm;height:297mm;margin:0;page-break-after:always;break-after:page;border:1px solid #e5a31c}.paper:last-child{page-break-after:auto;break-after:auto}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Quotation Maker</h1><div class="sub">iPhone • local-first • saved quotations</div>
+  <div class="tabs"><button id="tabQuote" class="tab active" onclick="show('quote')">New Quotation</button><button id="tabSaved" class="tab" onclick="show('saved')">Saved Quotations</button><button id="tabSettings" class="tab" onclick="show('settings')">Settings</button></div>
+</header>
+<main>
+<section id="quoteView" class="view active">
+  <div id="quoteForm">
+    <div class="card">
+      <h2>New Quotation</h2>
+      <div class="grid">
+        <div><label>Client Name</label><input id="client" placeholder="Enter client name" oninput="changed()"></div>
+        <div><label>Quotation Date</label><input id="qdate" type="date" oninput="changed()"></div>
+        <div><label>Event Date 1</label><input id="edate1" type="date" oninput="changed()"></div>
+        <div><label>Event Date 2 (optional)</label><input id="edate2" type="date" oninput="changed()"></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Add Service</h2>
+      <div class="grid"><div><label>Service</label><select id="serviceSel"></select></div><div style="align-self:end"><button class="btn yellow" style="width:100%" onclick="addService()">+ Add Service</button></div></div>
+      <div id="services"></div>
+      <div class="note">Select Haldi, Wedding, Albums or any preset you create in Settings. Price stays blank until you enter it.</div>
+    </div>
+    <div class="card">
+      <h2>Payment & Extra Terms</h2>
+      <div class="grid"><div><label>Advance Paid</label><input id="advance" type="number" min="0" placeholder="0" oninput="changed()"></div><div><label>Additional Terms (optional)</label><textarea id="extra" oninput="changed()" placeholder="Any extra terms for this quotation"></textarea></div></div>
+      <div class="btnrow"><button id="saveBtn" class="btn yellow" onclick="saveQuote(true)">Save Quotation</button><button class="btn dark" onclick="printQuote()">Print / Save PDF</button><button class="btn light" onclick="newQuote(true)">New / Clear</button></div>
+      <div id="editState" class="note" style="display:none"></div>
+    </div>
+    <button class="btn light preview-btn" onclick="togglePreview()">Preview Quotation</button>
+  </div>
+  <div id="preview" class="preview">
+    <section class="paper">
+      <div class="logo">MAGIC <span>LENS</span> STUDIO</div><div class="qtitle">QUOTATION</div>
+      <div class="meta2"><div><b>QUOTATION DATE: <span id="pqdate" class="red">--/--/----</span></b><br><br><b>INQUIRED FOR DATE:</b><div id="pedates" class="red">--/--/----</div></div><div class="tofrom"><div><b>TO</b><div id="pclient" style="font-weight:700;margin-top:2mm">CLIENT NAME</div></div><div class="right"><b>FROM</b><div id="pfrom">Set business details in Settings</div></div></div></div>
+      <table class="qt"><thead><tr><th class="id">ID</th><th class="d">DESCRIPTION</th><th class="q">QTY</th><th class="p">PHOTOGRAPHY<br>PRICE</th><th class="t">TOTAL</th></tr></thead><tbody id="prows"></tbody></table>
+      <table class="sum"><tr><td class="lab" colspan="4">Advance</td><td id="padv" class="amt">Rs 0/-</td></tr><tr><td class="lab" colspan="4">Payment Left</td><td id="pleft" class="amt">Rs 0/-</td></tr><tr><td class="lab" colspan="4">Total</td><td id="pgrand" class="amt">Rs 0/-</td></tr></table>
+      <div class="footer">Page 1/2</div>
+    </section>
+    <section class="paper">
+      <div class="logo">MAGIC <span>LENS</span> STUDIO</div><div class="tc-title">TERMS AND CONDITIONS</div>
+      <div class="tc">
+        <p><b>BOOKING FEE (DEPOSIT) :</b> A non-refundable booking fee of 50% is required to confirm the booking. Payment of the deposit signifies acceptance of all terms and conditions. The booking amount is non-transferable in case of cancellation. The remaining balance must be paid at least 10 days prior to the wedding date.</p>
+        <p><b>IMAGES:</b> The Photographer will ensure natural and balanced colour tones; however, exact colour matching cannot be guaranteed due to lighting conditions, fabric materials, and camera limitations.</p>
+        <p style="color:#c22;text-decoration:underline">Images will be colour-corrected using Lightroom for a natural and vibrant look. Advanced Photoshop editing or photo manipulation will be charged additionally.</p>
+        <p style="color:#c22;text-decoration:underline">Final edited images will be delivered within approximately 2 months from the wedding date. Album delivery will take an additional 1 month after final selection and payment.</p>
+        <p style="color:#c22;text-decoration:underline">The Client grants the Photographer permission to use photographs from the event for portfolio, website, social media, advertising, and promotional purposes.</p>
+        <p><b>HALDI FUNCTION COVERAGE:</b> The Haldi ceremony will be covered by Magic Lens Studios professional team members. Please note that I may not be personally present for this function; however, the event coverage will be carried out with the same level of professionalism and quality standards committed under this agreement.</p>
+        <p>In the event of illness, accident, equipment failure, natural calamity, or any circumstances beyond the Photographer's control, an alternate professional photographer will be arranged where possible. If unable to do so, all payments received will be refunded, and no further liability or compensation shall apply.</p>
+        <div id="padd" class="additional"></div>
+        <p id="ppay" class="center"><b>PLEASE MAKE A PAYMENT TO</b><br>Set payment details in Settings</p>
+        <p class="center" style="font-size:17pt;margin-top:5mm">Thank you</p>
+      </div><div class="footer">Page 2/2</div>
+    </section>
+  </div>
+</section>
+
+<section id="savedView" class="view"><div class="card"><h2>Saved Quotations</h2><div class="note">Open any old quotation, make changes and press Save Changes. Data stays on this iPhone.</div><input id="search" placeholder="Search client, service or date" oninput="renderSaved()"><div id="savedList" class="saved" style="margin-top:10px"></div></div></section>
+
+<section id="settingsView" class="view">
+  <div class="card"><h2>Event Presets</h2><div class="note">Create an event once. Later just select it while making a quotation.</div><div class="grid"><div><label>Event / Service Name</label><input id="presetName" placeholder="Example: Engagement"></div><div><label>Saved Details</label><textarea id="presetDesc" placeholder="Details that should appear in the quotation"></textarea></div></div><input id="presetIndex" type="hidden" value="-1"><div class="btnrow"><button class="btn yellow" onclick="savePreset()">Save Preset</button><button class="btn light" onclick="clearPreset()">Clear</button></div><div id="presetList"></div></div>
+  <div class="card"><h2>Business & Payment Details</h2><div class="note">These details are stored only on this device. They are not uploaded to the website.</div><div class="grid">
+    <div><label>Your Name</label><input id="bizName"></div><div><label>Studio / Brand</label><input id="bizStudio"></div><div><label>Address</label><input id="bizAddress"></div><div><label>Phone</label><input id="bizPhones"></div><div><label>Email</label><input id="bizEmail"></div><div><label>Payment Name</label><input id="payName"></div><div><label>Account Type</label><input id="payType"></div><div><label>Account No.</label><input id="payAccount"></div><div><label>IFSC</label><input id="payIfsc"></div><div><label>Branch</label><input id="payBranch"></div><div><label>Bank Name</label><input id="payBank"></div><div><label>UPI / Google Pay</label><input id="payUpi"></div>
+  </div><div class="btnrow"><button class="btn yellow" onclick="saveProfile()">Save Details</button></div></div>
+  <div class="card"><h2>Backup</h2><div class="note">Save the backup in Files → iCloud Drive. It includes saved quotations, presets, your current draft and business details.</div><div class="btnrow"><button class="btn dark" onclick="backup()">Backup to Files / iCloud</button><button class="btn light" onclick="document.getElementById('restoreFile').click()">Restore Backup</button></div><input id="restoreFile" type="file" accept=".json,application/json" style="display:none" onchange="restoreBackup(this.files[0]);this.value=''"></div>
+</section>
+</main>
+<script>
+const defaults=[
+ {name:"Haldi",description:"No. Of Photographers: 01/Side\nExcluding : Album, Voti (Gift offering- Rs 2000 Extra/hr)\nHaldi max 4-5 Hrs (additional Coverage Rs 2000/Hr)"},
+ {name:"Wedding",description:"No. Of Photographers: 02\nExcluding : Album, Getting Ready (Rs 3000 Extra), Home Welcoming (Rs 5000 Extra + Travelling)"},
+ {name:"Albums",description:"12X36 NT GLOSS\nHaldi & Wedding Combined Album - Rs 8,000 (400 Images)\nExtra Pages Rs 200/Page"}
+];
+const emptyProfile={bizName:"",bizStudio:"",bizAddress:"",bizPhones:"",bizEmail:"",payName:"",payType:"",payAccount:"",payIfsc:"",payBranch:"",payBank:"",payUpi:""};
+let presets=read("qm_presets",defaults),saved=read("qm_saved",[]),profile=Object.assign({},emptyProfile,read("qm_profile",{})),services=[],currentId=localStorage.getItem("qm_current")||"";
+function read(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}}
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c]})}
+function money(n){return "Rs "+Number(n||0).toLocaleString("en-IN")+"/-"}
+function fd(s){if(!s)return "--/--/----";const a=s.split("-");return a.length===3?a[2]+"/"+a[1]+"/"+a[0]:s}
+function show(v){["quote","saved","settings"].forEach(function(x){document.getElementById(x+"View").classList.toggle("active",x===v);document.getElementById("tab"+x[0].toUpperCase()+x.slice(1)).classList.toggle("active",x===v)});if(v==="saved")renderSaved();if(v==="settings"){renderPresets();fillProfile()}}
+function refreshSelect(){const s=document.getElementById("serviceSel");s.innerHTML=presets.map(function(p,i){return '<option value="'+i+'">'+esc(p.name)+'</option>'}).join("")}
+function addService(){if(!presets.length)return;const p=presets[Number(document.getElementById("serviceSel").value)||0];services.push({name:p.name,description:p.description,qty:1,price:""});renderServices();changed()}
+function renderServices(){const b=document.getElementById("services");b.innerHTML=services.map(function(s,i){return '<div class="service"><div class="service-title">'+esc(s.name)+'</div><div class="desc">'+esc(s.description)+'</div><div class="service-grid"><input type="number" min="1" value="'+esc(s.qty)+'" oninput="services['+i+'].qty=this.value;changed()" aria-label="Quantity"><input type="number" min="0" value="'+esc(s.price)+'" placeholder="Enter price" oninput="services['+i+'].price=this.value;changed()" aria-label="Price"><button class="btn danger" onclick="services.splice('+i+',1);renderServices();changed()">×</button></div></div>'}).join("")}
+function draft(){return{client:client.value,qdate:qdate.value,edate1:edate1.value,edate2:edate2.value,advance:advance.value,extra:extra.value,services:services}}
+function apply(d){if(!d)return;["client","qdate","edate1","edate2","advance","extra"].forEach(function(k){document.getElementById(k).value=d[k]||""});services=Array.isArray(d.services)?JSON.parse(JSON.stringify(d.services)):[];renderServices()}
+function changed(){localStorage.setItem("qm_draft",JSON.stringify(draft()));render()}
+function render(){pclient.textContent=client.value.trim()||"CLIENT NAME";pqdate.textContent=fd(qdate.value);pedates.innerHTML=[edate1.value,edate2.value].filter(Boolean).map(fd).join("<br>")||"--/--/----";
+ const from=[profile.bizName,profile.bizStudio,profile.bizAddress,profile.bizPhones,profile.bizEmail].filter(Boolean);pfrom.innerHTML=from.length?from.map(esc).join("<br>"):"Set business details in Settings";
+ prows.innerHTML=services.length?services.map(function(s,i){const q=Number(s.qty||0),p=Number(s.price||0);return '<tr><td class="id">'+String(i+1).padStart(2,"0")+'</td><td class="d"><div class="svcprint">'+esc(s.name).toUpperCase()+'</div><div class="svclines">'+esc(s.description)+'</div></td><td class="q">'+(q||"")+'</td><td class="p">'+(s.price!==""?money(p):"")+'</td><td class="t">'+(s.price!==""?money(q*p):"")+'</td></tr>'}).join(""):'<tr><td class="id">01</td><td class="d"><div class="svcprint">SELECT A SERVICE</div></td><td class="q">-</td><td class="p">-</td><td class="t">-</td></tr>';
+ const total=services.reduce(function(a,s){return a+Number(s.qty||0)*Number(s.price||0)},0),adv=Number(advance.value||0);padv.textContent=money(adv);pleft.textContent=money(Math.max(total-adv,0));pgrand.textContent=money(total);
+ padd.innerHTML=extra.value.trim()?'<b>ADDITIONAL TERMS & CONDITIONS:</b><br>'+esc(extra.value.trim()).replace(/\n/g,"<br>"):"";
+ const pay=[];if(profile.payName)pay.push("Name : "+profile.payName);if(profile.payType)pay.push("Account Type : "+profile.payType);if(profile.payAccount)pay.push("Ac No: "+profile.payAccount);if(profile.payIfsc)pay.push("IFSC: "+profile.payIfsc);if(profile.payBranch)pay.push("Branch: "+profile.payBranch);if(profile.payBank)pay.push("Bank Name: "+profile.payBank);if(profile.payUpi)pay.push("Paytm/Google pay : "+profile.payUpi);ppay.innerHTML='<b>PLEASE MAKE A PAYMENT TO</b><br>'+(pay.length?pay.map(esc).join("<br>"):"Set payment details in Settings");
+ updateState()}
+function id(){return(window.crypto&&crypto.randomUUID)?crypto.randomUUID():"q_"+Date.now()+"_"+Math.random().toString(36).slice(2)}
+function saveQuote(alertUser){const d=draft();if(!d.client.trim()){if(alertUser)alert("Enter client name.");return false}if(!d.services.length){if(alertUser)alert("Add at least one service.");return false}const now=new Date().toISOString(),i=saved.findIndex(function(x){return x.id===currentId});if(i>=0){saved[i]=Object.assign({},JSON.parse(JSON.stringify(d)),{id:currentId,createdAt:saved[i].createdAt||now,updatedAt:now})}else{currentId=id();saved.push(Object.assign({},JSON.parse(JSON.stringify(d)),{id:currentId,createdAt:now,updatedAt:now}));localStorage.setItem("qm_current",currentId)}localStorage.setItem("qm_saved",JSON.stringify(saved));changed();renderSaved();updateState();if(alertUser)alert(i>=0?"Quotation changes saved.":"Quotation saved.");return true}
+function updateState(){const q=saved.find(function(x){return x.id===currentId});saveBtn.textContent=q?"Save Changes":"Save Quotation";editState.style.display=q?"block":"none";editState.textContent=q?"Editing saved quotation: "+(q.client||"Unnamed client"):""}
+function printQuote(){if(client.value.trim()&&services.length)saveQuote(false);preview.classList.add("open");render();setTimeout(function(){window.print()},80)}
+function togglePreview(){preview.classList.toggle("open");render()}
+function newQuote(ask){if(ask&&!confirm("Clear this quotation and start a new one?"))return;currentId="";localStorage.removeItem("qm_current");client.value=edate1.value=edate2.value=advance.value=extra.value="";qdate.value=new Date().toISOString().slice(0,10);services=[];renderServices();changed();updateState()}
+function renderSaved(){const term=(search.value||"").toLowerCase();const list=saved.slice().sort(function(a,b){return String(b.updatedAt||"").localeCompare(String(a.updatedAt||""))}).filter(function(q){return [q.client,q.qdate,q.edate1,q.edate2].concat((q.services||[]).map(function(s){return s.name})).join(" ").toLowerCase().includes(term)});savedList.innerHTML=list.length?list.map(function(q){const tot=(q.services||[]).reduce(function(a,s){return a+Number(s.qty||0)*Number(s.price||0)},0);return '<div class="saved-item"><h3>'+esc(q.client||"Unnamed")+'</h3><div class="meta"><b>Quotation:</b> '+esc(fd(q.qdate))+'<br><b>Event:</b> '+esc([q.edate1,q.edate2].filter(Boolean).map(fd).join(" & ")||"—")+'<br><b>Services:</b> '+esc((q.services||[]).map(function(s){return s.name}).join(", "))+'</div><div class="total">Total: '+money(tot)+'</div><div class="btnrow"><button class="btn yellow" onclick="openQuote(\''+q.id+'\')">Open / Edit</button><button class="btn light" onclick="duplicateQuote(\''+q.id+'\')">Duplicate</button><button class="btn danger" onclick="deleteQuote(\''+q.id+'\')">Delete</button></div></div>'}).join(""):'<div class="note">No saved quotations found.</div>'}
+function openQuote(x){const q=saved.find(function(v){return v.id===x});if(!q)return;currentId=x;localStorage.setItem("qm_current",x);apply(q);show("quote");changed();window.scrollTo(0,0)}
+function duplicateQuote(x){const q=saved.find(function(v){return v.id===x});if(!q)return;currentId="";localStorage.removeItem("qm_current");apply(q);show("quote");changed();window.scrollTo(0,0)}
+function deleteQuote(x){if(!confirm("Delete this saved quotation?"))return;saved=saved.filter(function(q){return q.id!==x});localStorage.setItem("qm_saved",JSON.stringify(saved));if(currentId===x){currentId="";localStorage.removeItem("qm_current")}renderSaved();updateState()}
+function renderPresets(){presetList.innerHTML=presets.map(function(p,i){return '<div class="preset"><h3>'+esc(p.name)+'</h3><p>'+esc(p.description)+'</p><div class="btnrow"><button class="btn light" onclick="editPreset('+i+')">Edit</button><button class="btn danger" onclick="deletePreset('+i+')">Delete</button></div></div>'}).join("")}
+function savePreset(){const n=presetName.value.trim(),d=presetDesc.value.trim();if(!n||!d){alert("Enter event name and details.");return}const i=Number(presetIndex.value);if(i>=0)presets[i]={name:n,description:d};else presets.push({name:n,description:d});localStorage.setItem("qm_presets",JSON.stringify(presets));clearPreset();renderPresets();refreshSelect()}
+function editPreset(i){presetName.value=presets[i].name;presetDesc.value=presets[i].description;presetIndex.value=i;window.scrollTo(0,0)}
+function deletePreset(i){if(!confirm("Delete "+presets[i].name+"?"))return;presets.splice(i,1);localStorage.setItem("qm_presets",JSON.stringify(presets));renderPresets();refreshSelect()}
+function clearPreset(){presetName.value="";presetDesc.value="";presetIndex.value="-1"}
+const pids=["bizName","bizStudio","bizAddress","bizPhones","bizEmail","payName","payType","payAccount","payIfsc","payBranch","payBank","payUpi"];
+function fillProfile(){pids.forEach(function(k){document.getElementById(k).value=profile[k]||""})}
+function saveProfile(){pids.forEach(function(k){profile[k]=document.getElementById(k).value.trim()});localStorage.setItem("qm_profile",JSON.stringify(profile));render();alert("Business and payment details saved on this iPhone.")}
+function pack(){return{app:"Quotation Maker",version:2,exportedAt:new Date().toISOString(),presets:presets,saved:saved,profile:profile,draft:draft()}}
+async function backup(){const file=new File([JSON.stringify(pack(),null,2)],"Quotation-Maker-Backup-"+new Date().toISOString().slice(0,10)+".json",{type:"application/json"});try{if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:"Quotation Maker Backup"});return}}catch(e){if(e.name==="AbortError")return}const a=document.createElement("a");a.href=URL.createObjectURL(file);a.download=file.name;a.click();setTimeout(function(){URL.revokeObjectURL(a.href)},1000)}
+async function restoreBackup(file){if(!file||!confirm("Restore this backup and replace data on this phone?"))return;try{const o=JSON.parse(await file.text());if(!o||!Array.isArray(o.presets)||!Array.isArray(o.saved))throw Error("Invalid backup");presets=o.presets;saved=o.saved;profile=Object.assign({},emptyProfile,o.profile||{});localStorage.setItem("qm_presets",JSON.stringify(presets));localStorage.setItem("qm_saved",JSON.stringify(saved));localStorage.setItem("qm_profile",JSON.stringify(profile));if(o.draft){apply(o.draft);localStorage.setItem("qm_draft",JSON.stringify(o.draft))}currentId="";localStorage.removeItem("qm_current");refreshSelect();renderPresets();fillProfile();renderSaved();render();alert("Backup restored.")}catch(e){alert("Could not restore backup: "+e.message)}}
+function setupFromHash(){try{if(!location.hash.startsWith("#setup="))return false;let s=location.hash.slice(7).replace(/-/g,"+").replace(/_/g,"/");while(s.length%4)s+="=";const bytes=Uint8Array.from(atob(s),function(c){return c.charCodeAt(0)});const o=JSON.parse(new TextDecoder().decode(bytes));if(o.profile){profile=Object.assign({},emptyProfile,o.profile);localStorage.setItem("qm_profile",JSON.stringify(profile))}if(Array.isArray(o.presets)){presets=o.presets;localStorage.setItem("qm_presets",JSON.stringify(presets))}history.replaceState(null,"",location.pathname+location.search);return true}catch(e){return false}}
+(function init(){const did=setupFromHash(),d=read("qm_draft",null);if(d)apply(d);else qdate.value=new Date().toISOString().slice(0,10);refreshSelect();renderServices();renderPresets();fillProfile();renderSaved();render();if(did)setTimeout(function(){alert("Quotation Maker is ready. Your business details are saved only on this iPhone.")},350);if("serviceWorker" in navigator)navigator.serviceWorker.register("./sw.js").catch(function(){})})();
+</script>
+</body>
+</html>
