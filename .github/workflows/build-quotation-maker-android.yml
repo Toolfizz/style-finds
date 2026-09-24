@@ -40,6 +40,11 @@ jobs:
           mkdir -p "$HOME/.android"
           cp signing-key/debug.keystore "$HOME/.android/debug.keystore"
 
+      - name: Download PDF libraries
+        run: |
+          curl -L --fail --retry 3 "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" -o android-quotation-maker/app/src/main/assets/html2canvas.min.js
+          curl -L --fail --retry 3 "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" -o android-quotation-maker/app/src/main/assets/jspdf.umd.min.js
+
       - name: Build APK
         working-directory: android-quotation-maker
         run: gradle --no-daemon :app:assembleDebug
