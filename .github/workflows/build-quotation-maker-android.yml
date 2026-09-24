@@ -45,6 +45,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Quotation-Maker-Android-Signing-Key
-          path: ~/.android/debug.keystore
+          path: /home/runner/.android/debug.keystore
           if-no-files-found: error
           retention-days: 90
