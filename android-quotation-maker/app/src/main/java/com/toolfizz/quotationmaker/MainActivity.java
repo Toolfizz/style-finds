@@ -5,7 +5,7 @@ import android.print.PrintManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Bundle;
+import android.os.Bundle;\nimport android.os.CancellationSignal;\nimport android.os.ParcelFileDescriptor;\nimport android.print.PageRange;\nimport android.print.PrintAttributes;
 import android.print.PrintDocumentAdapter;
 import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
@@ -20,12 +20,12 @@ import java.nio.charset.StandardCharsets;
 
 public class MainActivity extends Activity {
     private static final int FILE_CHOOSER_REQUEST = 1001;
-    private static final int BACKUP_SAVE_REQUEST = 1002;
+    private static final int BACKUP_SAVE_REQUEST = 1002;\n    private static final int PDF_SAVE_REQUEST = 1003;
 
     private WebView webView;
     private ValueCallback<Uri[]> fileChooserCallback;
     private String pendingBackupJson;
-    private String pendingBackupName;
+    private String pendingBackupName;\n    private String pendingPdfName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +82,22 @@ public class MainActivity extends Activity {
         }
 
         @JavascriptInterface
+        public void savePdf(String filename) {
+            pendingPdfName = (filename == null || filename.trim().isEmpty())
+                    ? "Quotation.pdf" : filename;
+            if (!pendingPdfName.toLowerCase().endsWith(".pdf")) {
+                pendingPdfName += ".pdf";
+            }
+            runOnUiThread(() -> {
+                Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.setType("application/pdf");
+                intent.putExtra(Intent.EXTRA_TITLE, pendingPdfName);
+                startActivityForResult(intent, PDF_SAVE_REQUEST);
+            });
+        }
+
+        @JavascriptInterface
         public void saveBackup(String json, String filename) {
             pendingBackupJson = json;
             pendingBackupName = (filename == null || filename.trim().isEmpty())
@@ -112,6 +128,14 @@ public class MainActivity extends Activity {
             return;
         }
 
+        if (requestCode == PDF_SAVE_REQUEST) {
+            if (resultCode == RESULT_OK && data != null && data.getData() != null) {
+                writePdfToUri(data.getData(), pendingPdfName);
+            }
+            pendingPdfName = null;
+            return;
+        }
+
         if (requestCode == BACKUP_SAVE_REQUEST) {
             if (resultCode == RESULT_OK && data != null && data.getData() != null && pendingBackupJson != null) {
                 Uri uri = data.getData();
@@ -128,6 +152,83 @@ public class MainActivity extends Activity {
             pendingBackupJson = null;
             pendingBackupName = null;
         }
+    }
+
+    private void writePdfToUri(Uri uri, String documentName) {
+        runOnUiThread(() -> {
+            final PrintDocumentAdapter adapter = webView.createPrintDocumentAdapter(
+                    documentName == null ? "Quotation" : documentName.replaceAll("(?i)\\.pdf$", ""));
+            final PrintAttributes attributes = new PrintAttributes.Builder()
+                    .setMediaSize(PrintAttributes.MediaSize.ISO_A4)
+                    .setResolution(new PrintAttributes.Resolution("pdf", "pdf", 600, 600))
+                    .setMinMargins(PrintAttributes.Margins.NO_MARGINS)
+                    .build();
+            final CancellationSignal cancellationSignal = new CancellationSignal();
+
+            adapter.onStart();
+            adapter.onLayout(null, attributes, cancellationSignal,
+                    new PrintDocumentAdapter.LayoutResultCallback() {
+                        @Override
+                        public void onLayoutFinished(android.print.PrintDocumentInfo info, boolean changed) {
+                            try {
+                                final ParcelFileDescriptor pfd =
+                                        getContentResolver().openFileDescriptor(uri, "w");
+                                if (pfd == null) {
+                                    adapter.onFinish();
+                                    Toast.makeText(MainActivity.this,
+                                            "Could not open the selected PDF file.",
+                                            Toast.LENGTH_LONG).show();
+                                    return;
+                                }
+                                adapter.onWrite(new PageRange[]{PageRange.ALL_PAGES},
+                                        pfd, cancellationSignal,
+                                        new PrintDocumentAdapter.WriteResultCallback() {
+                                            @Override
+                                            public void onWriteFinished(PageRange[] pages) {
+                                                try { pfd.close(); } catch (Exception ignored) {}
+                                                adapter.onFinish();
+                                                Toast.makeText(MainActivity.this,
+                                                        "PDF saved successfully.",
+                                                        Toast.LENGTH_SHORT).show();
+                                            }
+
+                                            @Override
+                                            public void onWriteFailed(CharSequence error) {
+                                                try { pfd.close(); } catch (Exception ignored) {}
+                                                adapter.onFinish();
+                                                Toast.makeText(MainActivity.this,
+                                                        "Could not save PDF.",
+                                                        Toast.LENGTH_LONG).show();
+                                            }
+
+                                            @Override
+                                            public void onWriteCancelled() {
+                                                try { pfd.close(); } catch (Exception ignored) {}
+                                                adapter.onFinish();
+                                            }
+                                        });
+                            } catch (Exception e) {
+                                adapter.onFinish();
+                                Toast.makeText(MainActivity.this,
+                                        "Could not save PDF: " + e.getMessage(),
+                                        Toast.LENGTH_LONG).show();
+                            }
+                        }
+
+                        @Override
+                        public void onLayoutFailed(CharSequence error) {
+                            adapter.onFinish();
+                            Toast.makeText(MainActivity.this,
+                                    "Could not prepare PDF.",
+                                    Toast.LENGTH_LONG).show();
+                        }
+
+                        @Override
+                        public void onLayoutCancelled() {
+                            adapter.onFinish();
+                        }
+                    }, null);
+        });
     }
 
     @Override
