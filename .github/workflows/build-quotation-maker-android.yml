@@ -1,0 +1,68 @@
+name: Build Quotation Maker Android
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths:
+      - "android-quotation-maker/**"
+      - ".github/workflows/build-quotation-maker-android.yml"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.7"
+
+      - name: Restore existing Android signing key
+        uses: actions/download-artifact@v4
+        with:
+          name: Quotation-Maker-Android-Signing-Key
+          path: signing-key
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: 35969163797
+
+      - name: Install signing key
+        run: |
+          mkdir -p "$HOME/.android"
+          cp signing-key/debug.keystore "$HOME/.android/debug.keystore"
+
+      - name: Download PDF libraries
+        run: |
+          curl -L --fail --retry 3 "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" -o android-quotation-maker/app/src/main/assets/html2canvas.min.js
+          curl -L --fail --retry 3 "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" -o android-quotation-maker/app/src/main/assets/jspdf.umd.min.js
+
+      - name: Build APK
+        working-directory: android-quotation-maker
+        run: gradle --no-daemon :app:assembleDebug
+
+      - name: Rename APK
+        run: cp android-quotation-maker/app/build/outputs/apk/debug/app-debug.apk "Quotation Maker for Photographers.apk"
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Quotation-Maker-for-Photographers-Android
+          path: "Quotation Maker for Photographers.apk"
+          if-no-files-found: error
+
+      - name: Upload signing key
+        uses: actions/upload-artifact@v4
+        with:
+          name: Quotation-Maker-Android-Signing-Key
+          path: /home/runner/.android/debug.keystore
+          if-no-files-found: error
+          retention-days: 90
