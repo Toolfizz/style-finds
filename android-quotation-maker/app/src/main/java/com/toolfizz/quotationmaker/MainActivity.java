@@ -1,7 +1,7 @@
 package com.toolfizz.quotationmaker;
 
 import android.app.Activity;
-import android.app.PrintManager;
+import android.print.PrintManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
