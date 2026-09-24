@@ -1,12 +1,12 @@
 {
-  "name": "Quotation Maker",
+  "name": "Quotation Maker for Photographers",
   "short_name": "Quotation Maker",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "background_color": "#f4f5f7",
   "theme_color": "#111111",
-  "description": "Local-first quotation maker for iPhone and Android",
+  "description": "Quotation maker for photographers with saved quotations, editable presets, logo and mobile backup",
   "icons": [
     {
       "src": "./icon.svg",
