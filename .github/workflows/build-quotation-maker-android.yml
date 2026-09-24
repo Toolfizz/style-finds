@@ -40,3 +40,11 @@ jobs:
           name: Quotation-Maker-for-Photographers-Android
           path: "Quotation Maker for Photographers.apk"
           if-no-files-found: error
+
+      - name: Upload signing key
+        uses: actions/upload-artifact@v4
+        with:
+          name: Quotation-Maker-Android-Signing-Key
+          path: ~/.android/debug.keystore
+          if-no-files-found: error
+          retention-days: 90
