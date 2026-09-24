@@ -27,11 +27,18 @@ jobs:
         with:
           gradle-version: "8.7"
 
-      - name: Create stable build signing key
+      - name: Restore existing Android signing key
+        uses: actions/download-artifact@v4
+        with:
+          name: Quotation-Maker-Android-Signing-Key
+          path: signing-key
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: 35969163797
+
+      - name: Install signing key
         run: |
           mkdir -p "$HOME/.android"
-          rm -f "$HOME/.android/debug.keystore"
-          keytool -genkeypair -v             -keystore "$HOME/.android/debug.keystore"             -storepass android             -alias androiddebugkey             -keypass android             -dname "CN=Quotation Maker for Photographers,O=ToolFizz,C=IN"             -keyalg RSA             -keysize 2048             -validity 10000             -noprompt
+          cp signing-key/debug.keystore "$HOME/.android/debug.keystore"
 
       - name: Build APK
         working-directory: android-quotation-maker
