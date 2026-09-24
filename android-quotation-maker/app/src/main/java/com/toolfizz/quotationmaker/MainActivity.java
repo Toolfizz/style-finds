@@ -5,7 +5,11 @@ import android.print.PrintManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Bundle;\nimport android.os.CancellationSignal;\nimport android.os.ParcelFileDescriptor;\nimport android.print.PageRange;\nimport android.print.PrintAttributes;
+import android.os.Bundle;
+import android.os.CancellationSignal;
+import android.os.ParcelFileDescriptor;
+import android.print.PageRange;
+import android.print.PrintAttributes;
 import android.print.PrintDocumentAdapter;
 import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
@@ -20,12 +24,14 @@ import java.nio.charset.StandardCharsets;
 
 public class MainActivity extends Activity {
     private static final int FILE_CHOOSER_REQUEST = 1001;
-    private static final int BACKUP_SAVE_REQUEST = 1002;\n    private static final int PDF_SAVE_REQUEST = 1003;
+    private static final int BACKUP_SAVE_REQUEST = 1002;
+    private static final int PDF_SAVE_REQUEST = 1003;
 
     private WebView webView;
     private ValueCallback<Uri[]> fileChooserCallback;
     private String pendingBackupJson;
-    private String pendingBackupName;\n    private String pendingPdfName;
+    private String pendingBackupName;
+    private String pendingPdfName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
