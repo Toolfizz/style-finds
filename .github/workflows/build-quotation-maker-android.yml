@@ -27,6 +27,12 @@ jobs:
         with:
           gradle-version: "8.7"
 
+      - name: Create stable build signing key
+        run: |
+          mkdir -p "$HOME/.android"
+          rm -f "$HOME/.android/debug.keystore"
+          keytool -genkeypair -v             -keystore "$HOME/.android/debug.keystore"             -storepass android             -alias androiddebugkey             -keypass android             -dname "CN=Quotation Maker for Photographers,O=ToolFizz,C=IN"             -keyalg RSA             -keysize 2048             -validity 10000             -noprompt
+
       - name: Build APK
         working-directory: android-quotation-maker
         run: gradle --no-daemon :app:assembleDebug
